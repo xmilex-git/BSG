@@ -1,0 +1,8 @@
+#API_key file
+API_KEY
+
+#Debug files
+*.out
+
+#Databases
+data.*
