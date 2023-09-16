@@ -22,7 +22,7 @@ const headers = {
   Origin: "https://developer.riotgames.com",
 };
 
-// Setup axios instance with headers
+//! Setup axios instance with headers
 const apiClient = axios.create({
   headers: headers,
 });
