@@ -6,8 +6,6 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-//https://github.com/xmilex-git/BSG.git
-
 // Constants
 const RIOT_API_KEY = "RGAPI-e436417a-5f65-448e-9325-3ced74531f15"; // Your Riot API key
 const BASE_URL_SUMMONER =
