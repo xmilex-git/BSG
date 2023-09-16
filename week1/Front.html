@@ -1,0 +1,89 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BSG</title>
+    <style>
+    body {
+        height: 100%;
+        font-family: 'Inter', 'Noto Sans KR', system-ui, -apple-system,
+        BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+        'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    .wrapper {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .title {
+        font-size: 2.5rem;
+        background: -webkit-linear-gradient(315deg, #42d392 25%, #647eff);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .sub-title {
+        font-size: 1.25rem;
+        align-items: center;
+    }
+    .card {
+        border-radius: 16px;
+        padding: 1rem 2rem;
+        background-color: #eee;
+    }
+    .win{
+        color : rgb(61, 61, 255);
+    }
+    .loose{
+        color : rgb(203, 66, 66);
+    }
+    .results{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap : 10px;
+    }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap"
+    rel="stylesheet"
+    />
+</head>
+<body>
+    <div class="wrapper">
+    <h1 class="title">About {{Player}}'s Last 20 Games</h1>
+    <section class="card">
+        <p>
+        <h2 class="sub-title">Wins & Looses</h2>
+        <div class="results">
+        <span class="{{w1-class}}">{{w1}}</span>
+        <span class="{{w2-class}}">{{w2}}</span>
+        <span class="{{w3-class}}">{{w3}}</span>
+        <span class="{{w4-class}}">{{w4}}</span>
+        <span class="{{w5-class}}">{{w5}}</span>
+        <span class="{{w6-class}}">{{w6}}</span>
+        <span class="{{w7-class}}">{{w7}}</span>
+        <span class="{{w8-class}}">{{w8}}</span>
+        <span class="{{w9-class}}">{{w9}}</span>
+        <span class="{{w10-class}}">{{w10}}</span>
+        <span class="{{w11-class}}">{{w11}}</span>
+        <span class="{{w12-class}}">{{w12}}</span>
+        <span class="{{w13-class}}">{{w13}}</span>
+        <span class="{{w14-class}}">{{w14}}</span>
+        <span class="{{w15-class}}">{{w15}}</span>
+        <span class="{{w16-class}}">{{w16}}</span>
+        <span class="{{w17-class}}">{{w17}}</span>
+        <span class="{{w18-class}}">{{w18}}</span>
+        <span class="{{w19-class}}">{{w19}}</span>
+        <span class="{{w20-class}}">{{w20}}</span>
+    </div>
+        </p>
+    </section>
+    </div>
+</body>
+</html>
+
