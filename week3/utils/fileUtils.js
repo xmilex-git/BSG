@@ -6,6 +6,7 @@ export const RIOT_API_KEY = process.env.RIOT_API_KEY;
 export const BASE_URL_SUMMONER = process.env.BASE_URL_SUMMONER;
 export const BASE_URL_MATCH = process.env.BASE_URL_MATCH;
 
+
 //! Headers
 export const HEADERS = {
   "X-Riot-Token": RIOT_API_KEY,
@@ -15,3 +16,12 @@ export const HEADERS = {
   "Accept-Charset": "application/x-www-form-urlencoded; charset=UTF-8",
   Origin: "https://developer.riotgames.com",
 };
+
+const utils = {
+  RIOT_API_KEY,
+  BASE_URL_SUMMONER,
+  BASE_URL_MATCH,
+  HEADERS,
+};
+
+export default utils;

@@ -20,7 +20,7 @@ const apiClient = axios.create({
   headers: HEADERS,
 });
 
-export const getUsers = async () => {
+const getUsers = async () => {
   try {
     const data = await fs.readFile(USERS_FILE, "utf-8");
     return JSON.parse(data);
@@ -29,7 +29,7 @@ export const getUsers = async () => {
   }
 };
 
-export const saveUsers = async (users) => {
+const saveUsers = async (users) => {
   await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
 };
 
@@ -38,6 +38,7 @@ const getSummonerPuuid = async (summonerName) => {
     const response = await apiClient.get(
       `${BASE_URL_SUMMONER}/${summonerName}`
     );
+
     return response.data.puuid;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -62,21 +63,26 @@ const getMatchResultByMatchId = async (matchId, puuid) => {
 
 const getLast20Games = async (summonerName) => {
   try {
+    console.log("summonor:", summonerName);
+
     const puuid = await getSummonerPuuid(summonerName);
-    console.log(puuid);
+
+    console.log("puuid:", puuid);
 
     const matchIds = await getMatchIdsByPuuid(puuid);
-    console.log(matchIds);
+    console.log("matchIds", matchIds);
 
     const matchResults = [];
     for (const matchId of matchIds) {
       const result = await getMatchResultByMatchId(matchId, puuid);
-      matchResults.push(result);
-      console.log(result);
-      // No need to sleep here as per the original comment
+      if (result) {
+        matchResults.push("승리");
+      } else {
+        matchResults.push("패배");
+      }
     }
-
     console.log(matchResults);
+
     return matchResults;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -84,4 +90,13 @@ const getLast20Games = async (summonerName) => {
   }
 };
 
-export { getSummonerPuuid, getMatchResultByMatchId, getLast20Games };
+const utils = {
+  getUsers,
+  saveUsers,
+  getSummonerPuuid,
+  getMatchIdsByPuuid,
+  getMatchResultByMatchId,
+  getLast20Games,
+};
+
+export default utils;

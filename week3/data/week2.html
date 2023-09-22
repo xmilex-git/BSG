@@ -2,7 +2,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OS Information</title>
+    <title>BSG / 전적 함 볼까? </title>
     <style>
       body {
         height: 100%;
@@ -62,7 +62,10 @@
         opacity: 0;
       }
       .wrapper {
-        height: 100%;
+        max-width: 60rem;
+        margin: auto;
+        padding: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -75,13 +78,32 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
+      .match-item {
+        width: 46rem;
+        border-radius: 12px;
+        display: flex; /* Flexbox 레이아웃 적용 */
+        align-items: center; /* 세로 중앙 정렬 */
+        justify-content: center;
+        margin-bottom: 10px; /* 매치 항목 간의 간격 */
+      }
       .sub-title {
+        margin-right: 10px;
         font-size: 1.25rem;
+        font-weight: bold;
       }
       .card {
+        width: 50rem;
         border-radius: 16px;
         padding: 1rem 2rem;
         background-color: #eee;
+        justify-content: center;
+        overflow-y: auto;
+      }
+      .victory {
+        background-color: lightblue; /* 파란색으로 승리 배경색 지정 */
+      }
+      .defeat {
+        background-color: lightcoral; /* 빨간색으로 패배 배경색 지정 */
       }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -93,29 +115,23 @@
     <script>
       let formType = "login";
 
-      const load = async () => {
+      const load = async (summonerName) => {
         try {
-          const data = await fetch("/match").then((res) => res.json());
-          document.querySelector(".match 1").innerText = data.m1;
-          document.querySelector(".match 2").innerText = data.m2;
-          document.querySelector(".match 3").innerText = data.m3;
-          document.querySelector(".match 4").innerText = data.m4;
-          document.querySelector(".match 5").innerText = data.m5;
-          document.querySelector(".match 6").innerText = data.m6;
-          document.querySelector(".match 7").innerText = data.m7;
-          document.querySelector(".match 8").innerText = data.m8;
-          document.querySelector(".match 9").innerText = data.m9;
-          document.querySelector(".match 10").innerText = data.m10;
-          document.querySelector(".match 11").innerText = data.m11;
-          document.querySelector(".match 12").innerText = data.m12;
-          document.querySelector(".match 13").innerText = data.m13;
-          document.querySelector(".match 14").innerText = data.m14;
-          document.querySelector(".match 15").innerText = data.m15;
-          document.querySelector(".match 16").innerText = data.m16;
-          document.querySelector(".match 17").innerText = data.m17;
-          document.querySelector(".match 18").innerText = data.m18;
-          document.querySelector(".match 19").innerText = data.m19;
-          document.querySelector(".match 20").innerText = data.m20;
+          const data = await fetch(`/match?summonerName=${encodeURIComponent(summonerName)}`).then((res) => res.json());
+          
+          // 각 매치 결과에 따라 적절한 클래스 추가
+          for (let i = 1; i <= 20; i++) {
+            const matchResult = data[`m${i}`];
+            const matchElement = document.querySelector(`.match${i}`);
+            matchElement.innerText = matchResult;
+      
+            const matchItemElement = matchElement.closest('.match-item');
+            if (matchResult === '승리') {
+              matchItemElement.classList.add('victory');
+            } else if (matchResult === '패배') {
+              matchItemElement.classList.add('defeat');
+            }
+          }
         } catch (error) {
           console.error(error);
           alert("⚠️ 서버에서 데이터를 가져올 수 없어요! ⚠️\n" + error.message);
@@ -124,38 +140,33 @@
 
       const searchSummoner = async (e) => {
         e.preventDefault();
-        const username = e.target.username.value;
+        const summonerName = e.target.summonerName.value;
+
         //const password = e.target.password.value;
-        if (!username) {
+        if (!summonerName) {
           alert("⚠️ 소환사명을 입력해주세요! ⚠️");
           return;
         }
         try {
-          const data = await fetch("/searchSummoner", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username }),
-          });
+          const data = await fetch(`/searchSummoner?summonerName=${encodeURIComponent(summonerName)}`);
           if (data.status !== 200) {
-            alert("⚠️ 소환사 검색에 실패했어요! ⚠️");
+            alert(`⚠️ ${ summonerName } 소환사 검색에 실패했어요! ⚠️`);
             return;
           }
-          document.querySelector(".searchSummoner").classList.add("hide");
-          await load();
+          document.querySelector(".login").classList.add("hide");
+          await load(summonerName);
         } catch (error) {
           console.error(error);
-          alert("⚠️ 서버에서 데이터를 가져올 수 없어요! ⚠️\n" + error.message);
+          alert(`⚠️ 서버에서 ${ summonerName } 데이터를 가져올 수 없어요! ⚠️\n` + error.message);
         }
       };
 
       const signup = async (e) => {
         e.preventDefault();
-        const username = e.target.username.value;
+        const summonerName = e.target.summonerName.value;
         const password = e.target.password.value;
         const email = e.target.email.value;
-        if (!username || !password) {
+        if (!summonerName || !password) {
           alert("⚠️ 아이디와 비밀번호를 입력해주세요!");
           return;
         }
@@ -169,7 +180,7 @@
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ username, password, email }),
+            body: JSON.stringify({ summonerName, password, email }),
           });
           if (data.status !== 201) {
             alert("⚠️ 회원가입에 실패했어요!");
@@ -200,7 +211,7 @@
         method="POST"
         onsubmit="formType == 'login' ? searchSummoner(event) : signup(event)"
       >
-        <input type="text" name="username" placeholder="소환사명" />
+        <input type="text" name="summonerName" placeholder="소환사명" />
         <!-- <input type="password" name="password" placeholder="비밀번호" />
         <input type="hidden" name="email" placeholder="이메일" /> -->
         <button type="submit">검색</button>
@@ -208,50 +219,90 @@
       </form>
     </div>
     <div class="wrapper">
-      <h1 class="title">About { {username} }</h1>
+      <h1 class="title">About current 20 Games </h1>
       <section class="card">
-        <p class="total-mem">Loading...</p>
-        <h3 class ="match 1"> Loading ... </h3>
-        <h3 class="sub-title"> match </h3>
-        <p class ="match 2"> Loading ... </p>
-        <h3 class="sub-title"> match </h3>
-        <p class ="match 3"> Loading ... </p>
-        <h3 class="sub-title"> match </h3>
-        <p class ="match 4"> Loading ... </p>
-        <h3 class="sub-title"> match </h3>
-        <p class ="match 5"> Loading ... </p>
-        <h3 class="sub-title"> match </h3>
-        <p class ="match 6"> Loading ... </p>
-        <h3 class="sub-title"> match </h3>
-        <p class ="match 7"> Loading ... </p>
-        <h3 class="sub-title"> match </h3>
-        <p class ="match 8"> Loading ... </p>
-        <h3 class="sub-title"> match </h3>
-        <p class ="match 9"> Loading ... </p>
-        <h3 class="sub-title"> match </h3>
-        <p class ="match 10"> Loading ...  </p>
-        <h3 class="sub-title"> match </h3>       
-        <p class ="match 11"> Loading ...  </p>
-        <h3 class="sub-title"> match </h3>       
-        <p class ="match 12"> Loading ...  </p>
-        <h3 class="sub-title"> match </h3>       
-        <p class ="match 13"> Loading ...  </p>
-        <h3 class="sub-title"> match </h3>       
-        <p class ="match 14"> Loading ...  </p>
-        <h3 class="sub-title"> match </h3>       
-        <p class ="match 15"> Loading ...  </p>
-        <h3 class="sub-title"> match </h3>       
-        <p class ="match 16"> Loading ...  </p>
-        <h3 class="sub-title"> match </h3>       
-        <p class ="match 17"> Loading ...  </p>
-        <h3 class="sub-title"> match </h3>       
-        <p class ="match 18"> Loading ...  </p>
-        <h3 class="sub-title"> match </h3>       
-        <p class ="match 19"> Loading ...  </p>
-        <h3 class="sub-title"> match </h3>       
-        <p class ="match 20"> Loading ...  </p>
+        <div class="match-item">
+          <h3 class="sub-title">match1</h3>
+          <p class ="match1"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match2</h3>
+          <p class ="match2"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match3</h3>
+          <p class ="match3"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match4</h3>
+          <p class ="match4"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match5</h3>
+          <p class ="match5"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match6</h3>
+          <p class ="match6"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match7</h3>
+          <p class ="match7"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match8</h3>
+          <p class ="match8"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match9</h3>
+          <p class ="match9"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match10</h3>
+          <p class ="match10"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match11</h3>
+          <p class ="match11"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match12</h3>
+          <p class ="match12"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match13</h3>
+          <p class ="match13"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match14</h3>
+          <p class ="match14"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match15</h3>
+          <p class ="match15"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match16</h3>
+          <p class ="match16"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match17</h3>
+          <p class ="match17"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match18</h3>
+          <p class ="match18"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match19</h3>
+          <p class ="match19"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match20</h3>
+          <p class ="match20"> Loading ... </p>
+        </div>
 
       </section>></h3>
-    </div>></h3>
+    </div>/h3>
   </body>
 </html>
