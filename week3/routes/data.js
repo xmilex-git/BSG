@@ -1,7 +1,7 @@
 import express from "express";
-import os from "os";
-import { getUsers, getLast20Games } from "../utils/getDataUtils.js";
+import dataUtils from "../utils/getDataUtils.js";
 
+const { getLast20Games } = dataUtils;
 const router = express.Router();
 
 //! 유저 endPoint get
@@ -21,10 +21,7 @@ router.get("/users", async (req, res) => {
 
 //! match 정보 얻기
 router.get("/match", async (req, res) => {
-  const { summonerName } = req.body;
-  if (req.cookies.auth !== "valid-user") {
-    return res.status(401).send("권한 없음");
-  }
+  const { summonerName } = req.query;
 
   const matchBoolList = await getLast20Games(summonerName);
 

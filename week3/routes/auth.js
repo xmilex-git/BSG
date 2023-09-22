@@ -6,13 +6,9 @@ import {
   BASE_URL_SUMMONER,
   HEADERS,
 } from "../utils/fileUtils.js";
-import {
-  getUsers,
-  saveUsers,
-  getSummonerPuuid,
-  getLast20Games,
-} from "../utils/getDataUtils.js";
+import dataUtils from "../utils/getDataUtils.js";
 
+const { getSummonerPuuid } = dataUtils;
 const router = express.Router();
 
 /* //! 회원가입 endPoint
@@ -32,22 +28,14 @@ router.post("/signup", async (req, res) => {
 }); */
 
 //! 소환사 검색 endPoint
-router.post("/searchSummoner", async (req, res) => {
-  const { summonerName } = req.body;
+router.get("/searchSummoner", async (req, res) => {
+  const { summonerName } = req.query;
   const puuid = await getSummonerPuuid(summonerName);
-  const users = await getUsers();
-
-  /* const user = users.find(
-    (u) => u.username === username && u.password === password
-  ); */
-
+  console.log(puuid);
   if (!puuid) {
     return res.status(401).send("유효하지 않음");
   }
-  users.push({ summonerName });
-  await saveUsers(users);
 
-  //res.cookie("auth", "valid-user", { maxAge: 900000 });
   res.status(200).send("검색 성공");
 });
 

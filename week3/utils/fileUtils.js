@@ -5,6 +5,11 @@ dotenv.config();
 export const RIOT_API_KEY = process.env.RIOT_API_KEY;
 export const BASE_URL_SUMMONER = process.env.BASE_URL_SUMMONER;
 export const BASE_URL_MATCH = process.env.BASE_URL_MATCH;
+/* export const RIOT_API_KEY = "RGAPI-b897a054-8620-4ad9-8645-0778bedf7b3d";
+export const BASE_URL_SUMMONER =
+  "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name";
+export const BASE_URL_MATCH =
+  "https://asia.api.riotgames.com/lol/match/v5/matches"; */
 
 //! Headers
 export const HEADERS = {
@@ -15,3 +20,12 @@ export const HEADERS = {
   "Accept-Charset": "application/x-www-form-urlencoded; charset=UTF-8",
   Origin: "https://developer.riotgames.com",
 };
+
+const utils = {
+  RIOT_API_KEY,
+  BASE_URL_SUMMONER,
+  BASE_URL_MATCH,
+  HEADERS,
+};
+
+export default utils;
