@@ -1,0 +1,308 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BSG / 전적 함 볼까? </title>
+    <style>
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: "Inter", "Noto Sans KR", system-ui, -apple-system,
+          BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+          "Open Sans", "Helvetica Neue", sans-serif;
+      }
+      .login {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(4px);
+        transition: all 0.5s ease-in-out;
+      }
+      .login > form {
+        width: 20rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+      }
+      .login > form > a {
+        background-color: #fff;
+        opacity: 0.75;
+        padding: 0 0.5rem;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+      input {
+        width: 100%;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: none;
+        font-size: 1rem;
+      }
+      button {
+        width: 100%;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        border: none;
+        background-color: #3581fa;
+        color: #fff;
+        cursor: pointer;
+      }
+      button:hover {
+        opacity: 0.8;
+      }
+      .hide {
+        visibility: hidden;
+        opacity: 0;
+      }
+      .wrapper {
+        max-width: 60rem;
+        margin: auto;
+        padding: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .title {
+        font-size: 2.5rem;
+        background: -webkit-linear-gradient(315deg, #42d392 25%, #647eff);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .match-item {
+        width: 46rem;
+        border-radius: 12px;
+        display: flex; /* Flexbox 레이아웃 적용 */
+        align-items: center; /* 세로 중앙 정렬 */
+        justify-content: center;
+        margin-bottom: 10px; /* 매치 항목 간의 간격 */
+      }
+      .sub-title {
+        margin-right: 10px;
+        font-size: 1.25rem;
+        font-weight: bold;
+      }
+      .card {
+        width: 50rem;
+        border-radius: 16px;
+        padding: 1rem 2rem;
+        background-color: #eee;
+        justify-content: center;
+        overflow-y: auto;
+      }
+      .victory {
+        background-color: lightblue; /* 파란색으로 승리 배경색 지정 */
+      }
+      .defeat {
+        background-color: lightcoral; /* 빨간색으로 패배 배경색 지정 */
+      }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      let formType = "login";
+
+      const load = async (summonerName) => {
+        try {
+          const data = await fetch(`/match?summonerName=${encodeURIComponent(summonerName)}`).then((res) => res.json());
+          
+          // 각 매치 결과에 따라 적절한 클래스 추가
+          for (let i = 1; i <= 20; i++) {
+            const matchResult = data[`m${i}`];
+            const matchElement = document.querySelector(`.match${i}`);
+            matchElement.innerText = matchResult;
+      
+            const matchItemElement = matchElement.closest('.match-item');
+            if (matchResult === '승리') {
+              matchItemElement.classList.add('victory');
+            } else if (matchResult === '패배') {
+              matchItemElement.classList.add('defeat');
+            }
+          }
+        } catch (error) {
+          console.error(error);
+          alert("⚠️ 서버에서 데이터를 가져올 수 없어요! ⚠️\n" + error.message);
+        }
+      };
+
+      const searchSummoner = async (e) => {
+        e.preventDefault();
+        const summonerName = e.target.summonerName.value;
+
+        //const password = e.target.password.value;
+        if (!summonerName) {
+          alert("⚠️ 소환사명을 입력해주세요! ⚠️");
+          return;
+        }
+        try {
+          const data = await fetch(`/searchSummoner?summonerName=${encodeURIComponent(summonerName)}`);
+          if (data.status !== 200) {
+            alert(`⚠️ ${ summonerName } 소환사 검색에 실패했어요! ⚠️`);
+            return;
+          }
+          document.querySelector(".login").classList.add("hide");
+          await load(summonerName);
+        } catch (error) {
+          console.error(error);
+          alert(`⚠️ 서버에서 ${ summonerName } 데이터를 가져올 수 없어요! ⚠️\n` + error.message);
+        }
+      };
+
+      const signup = async (e) => {
+        e.preventDefault();
+        const summonerName = e.target.summonerName.value;
+        const password = e.target.password.value;
+        const email = e.target.email.value;
+        if (!summonerName || !password) {
+          alert("⚠️ 아이디와 비밀번호를 입력해주세요!");
+          return;
+        }
+        if (!email) {
+          alert("⚠️ 이메일을 입력해주세요!");
+          return;
+        }
+        try {
+          const data = await fetch("/signup", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ summonerName, password, email }),
+          });
+          if (data.status !== 201) {
+            alert("⚠️ 회원가입에 실패했어요!");
+            return;
+          }
+          alert("✅ 회원가입에 성공했어요!");
+        } catch (error) {
+          console.error(error);
+          alert("⚠️ 서버에서 데이터를 가져올 수 없어요!\n" + error.message);
+        }
+      };
+
+      const toggle = () => {
+        formType = formType === "login" ? "signup" : "login";
+        document.querySelector("button").innerText =
+          formType === "login" ? "검색" : "회원가입";
+        document.querySelector("a").innerText =
+          formType === "login" ? "회원가입 하기" : "검색 하기";
+        document.querySelector('input[name="email"]').type =
+          formType === "login" ? "hidden" : "email";
+      };
+    </script>
+  </head>
+  <body>
+    <div class="login">
+      <form
+        action="/searchSummoner"
+        method="POST"
+        onsubmit="formType == 'login' ? searchSummoner(event) : signup(event)"
+      >
+        <input type="text" name="summonerName" placeholder="소환사명" />
+        <!-- <input type="password" name="password" placeholder="비밀번호" />
+        <input type="hidden" name="email" placeholder="이메일" /> -->
+        <button type="submit">검색</button>
+        <a onclick="toggle()">회원가입 하기</a>
+      </form>
+    </div>
+    <div class="wrapper">
+      <h1 class="title">About current 20 Games </h1>
+      <section class="card">
+        <div class="match-item">
+          <h3 class="sub-title">match1</h3>
+          <p class ="match1"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match2</h3>
+          <p class ="match2"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match3</h3>
+          <p class ="match3"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match4</h3>
+          <p class ="match4"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match5</h3>
+          <p class ="match5"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match6</h3>
+          <p class ="match6"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match7</h3>
+          <p class ="match7"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match8</h3>
+          <p class ="match8"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match9</h3>
+          <p class ="match9"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match10</h3>
+          <p class ="match10"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match11</h3>
+          <p class ="match11"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match12</h3>
+          <p class ="match12"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match13</h3>
+          <p class ="match13"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match14</h3>
+          <p class ="match14"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match15</h3>
+          <p class ="match15"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match16</h3>
+          <p class ="match16"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match17</h3>
+          <p class ="match17"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match18</h3>
+          <p class ="match18"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match19</h3>
+          <p class ="match19"> Loading ... </p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match20</h3>
+          <p class ="match20"> Loading ... </p>
+        </div>
+
+      </section>></h3>
+    </div>/h3>
+  </body>
+</html>
