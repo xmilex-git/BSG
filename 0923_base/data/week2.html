@@ -23,7 +23,7 @@
         transition: all 0.5s ease-in-out;
       }
       .login > form {
-        width: 20rem;
+        width: 50rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -79,7 +79,7 @@
         -webkit-text-fill-color: transparent;
       }
       .match-item {
-        width: 46rem;
+        width: 90%;
         border-radius: 12px;
         display: flex; /* Flexbox 레이아웃 적용 */
         align-items: center; /* 세로 중앙 정렬 */
@@ -92,7 +92,7 @@
         font-weight: bold;
       }
       .card {
-        width: 50rem;
+        width: 90%;
         border-radius: 16px;
         padding: 1rem 2rem;
         background-color: #eee;
@@ -118,7 +118,8 @@
       const load = async (summonerName) => {
         try {
           const data = await fetch(`/match?summonerName=${encodeURIComponent(summonerName)}`).then((res) => res.json());
-          
+          const title = document.querySelector(`.title`);
+          title.innerText = summonerName;
           // 각 매치 결과에 따라 적절한 클래스 추가
           for (let i = 1; i <= 20; i++) {
             const matchResult = data[`m${i}`];
@@ -219,7 +220,8 @@
       </form>
     </div>
     <div class="wrapper">
-      <h1 class="title">About current 20 Games </h1>
+      <h1 class="title">About current 20 Games</h1>
+      <h1 class="title">최근 20판 전적!</h1>
       <section class="card">
         <div class="match-item">
           <h3 class="sub-title">match1</h3>
