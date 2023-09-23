@@ -3,8 +3,11 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.js";
 import dataRoutes from "./routes/data.js";
-import dataUtils from "./utils/getDataUtils.js";
-import fileUtils from "./utils/fileUtils.js";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const app = express();
 
 // Middleware
@@ -13,11 +16,9 @@ app.use(express.json());
 
 // Routes
 app.get("/", (req, res) => {
-  res.sendFile(path.join("/home/dobby/BSG/week3", "/data/week2.html"));
+  res.sendFile(path.join(__dirname, "/data/week2.html"));
 });
 
-/* app.use(fileUtils);
-app.use(dataUtils); */
 app.use(authRoutes);
 app.use(dataRoutes);
 
