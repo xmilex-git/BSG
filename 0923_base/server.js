@@ -13,11 +13,12 @@ const app = express();
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.render(path.join(__dirname, "/view/week2"));
+  res.sendFile(path.join(__dirname, "/view/week2.html"));
 });
 
 app.use(authRoutes);
 app.use(dataRoutes);
+app.use(express.static(path.join(__dirname, "view"))); //추가
 
 app.listen(3000, () => {
   console.log("Server started on http://localhost:3000");
