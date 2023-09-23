@@ -1,29 +1,13 @@
 import express from "express";
-import dataUtils from "../utils/getDataUtils.js";
+import GameService from "../services/GameService.js";
 
-const { getLast20Games } = dataUtils;
 const router = express.Router();
-
-//! 유저 endPoint get
-router.get("/users", async (req, res) => {
-  if (req.cookies.auth !== "valid-user") {
-    return res.status(401).send("권한 없음");
-  }
-
-  const users = await getUsers();
-  const withOutPassword = users.map(({ username, email }) => ({
-    username,
-    email,
-  }));
-
-  res.json(withOutPassword);
-});
 
 //! match 정보 얻기
 router.get("/match", async (req, res) => {
   const { summonerName } = req.query;
 
-  const matchBoolList = await getLast20Games(summonerName);
+  const matchBoolList = await GameService.getLast20Games(summonerName);
 
   const matchInfo = {
     m1: matchBoolList[0],

@@ -10,13 +10,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const app = express();
 
-// Middleware
 app.use(express.json());
-//app.use(cookieParser());
 
-// Routes
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "/data/week2.html"));
+  res.render(path.join(__dirname, "/view/week2"));
 });
 
 app.use(authRoutes);
