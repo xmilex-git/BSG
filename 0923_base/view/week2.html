@@ -2,110 +2,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BSG / 전적 함 볼까? </title>
-    <style>
-      body {
-        height: 100%;
-        margin: 0;
-        font-family: "Inter", "Noto Sans KR", system-ui, -apple-system,
-          BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
-          "Open Sans", "Helvetica Neue", sans-serif;
-      }
-      .login {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: rgba(0, 0, 0, 0.2);
-        backdrop-filter: blur(4px);
-        transition: all 0.5s ease-in-out;
-      }
-      .login > form {
-        width: 50rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-      }
-      .login > form > a {
-        background-color: #fff;
-        opacity: 0.75;
-        padding: 0 0.5rem;
-        cursor: pointer;
-        text-decoration: underline;
-      }
-      input {
-        width: 100%;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        border: none;
-        font-size: 1rem;
-      }
-      button {
-        width: 100%;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        font-size: 1rem;
-        border: none;
-        background-color: #3581fa;
-        color: #fff;
-        cursor: pointer;
-      }
-      button:hover {
-        opacity: 0.8;
-      }
-      .hide {
-        visibility: hidden;
-        opacity: 0;
-      }
-      .wrapper {
-        max-width: 60rem;
-        margin: auto;
-        padding: 10px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      }
-      .title {
-        font-size: 2.5rem;
-        background: -webkit-linear-gradient(315deg, #42d392 25%, #647eff);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-      .match-item {
-        width: 90%;
-        border-radius: 12px;
-        display: flex; /* Flexbox 레이아웃 적용 */
-        align-items: center; /* 세로 중앙 정렬 */
-        justify-content: center;
-        margin-bottom: 10px; /* 매치 항목 간의 간격 */
-      }
-      .sub-title {
-        margin-right: 10px;
-        font-size: 1.25rem;
-        font-weight: bold;
-      }
-      .card {
-        width: 90%;
-        border-radius: 16px;
-        padding: 1rem 2rem;
-        background-color: #eee;
-        justify-content: center;
-        overflow-y: auto;
-      }
-      .victory {
-        background-color: lightblue; /* 파란색으로 승리 배경색 지정 */
-      }
-      .defeat {
-        background-color: lightcoral; /* 빨간색으로 패배 배경색 지정 */
-      }
-    </style>
+    <title>BSG / 전적 함 볼까?</title>
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -117,20 +15,26 @@
 
       const load = async (summonerName) => {
         try {
-          const data = await fetch(`/match?summonerName=${encodeURIComponent(summonerName)}`).then((res) => res.json());
+          const data = await fetch(
+            `/match?summonerName=${encodeURIComponent(summonerName)}`
+          ).then((res) => res.json());
           const title = document.querySelector(`.title`);
           title.innerText = summonerName;
           // 각 매치 결과에 따라 적절한 클래스 추가
           for (let i = 1; i <= 20; i++) {
-            const matchResult = data[`m${i}`];
+            const matchResult = data[i - 1];
             const matchElement = document.querySelector(`.match${i}`);
-            matchElement.innerText = matchResult;
-      
-            const matchItemElement = matchElement.closest('.match-item');
-            if (matchResult === '승리') {
-              matchItemElement.classList.add('victory');
-            } else if (matchResult === '패배') {
-              matchItemElement.classList.add('defeat');
+            const textElement = matchElement.querySelector(".text");
+            textElement.innerText = `${matchResult.championName}   ${matchResult.kills}/${matchResult.deaths}/${matchResult.assists} \t \t \t 연속킬: ${matchResult.largestMultiKill}`;
+
+            if (matchResult.win) {
+              matchElement.closest(".match-item").classList.add("victory_bg");
+              matchElement.classList.add("result_field");
+              textElement.classList.add("victory_font");
+            } else {
+              matchElement.closest(".match-item").classList.add("defeat_bg");
+              matchElement.classList.add("result_field");
+              textElement.classList.add("defeat_font");
             }
           }
         } catch (error) {
@@ -149,16 +53,21 @@
           return;
         }
         try {
-          const data = await fetch(`/searchSummoner?summonerName=${encodeURIComponent(summonerName)}`);
+          const data = await fetch(
+            `/searchSummoner?summonerName=${encodeURIComponent(summonerName)}`
+          );
           if (data.status !== 200) {
-            alert(`⚠️ ${ summonerName } 소환사 검색에 실패했어요! ⚠️`);
+            alert(`⚠️ 어떻게 소환사 이름이 ${summonerName}? ⚠️`);
             return;
           }
           document.querySelector(".login").classList.add("hide");
           await load(summonerName);
         } catch (error) {
           console.error(error);
-          alert(`⚠️ 서버에서 ${ summonerName } 데이터를 가져올 수 없어요! ⚠️\n` + error.message);
+          alert(
+            `⚠️ 서버에서 ${summonerName} 데이터를 가져올 수 없어요! ⚠️\n` +
+              error.message
+          );
         }
       };
 
@@ -221,90 +130,90 @@
     </div>
     <div class="wrapper">
       <h1 class="title">About current 20 Games</h1>
-      <h1 class="title">최근 20판 전적!</h1>
+      <h2 class="title">최근 20판 전적!</h2>
       <section class="card">
         <div class="match-item">
           <h3 class="sub-title">match1</h3>
-          <p class ="match1"> Loading ... </p>
+          <p class="match1"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match2</h3>
-          <p class ="match2"> Loading ... </p>
+          <p class="match2"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match3</h3>
-          <p class ="match3"> Loading ... </p>
+          <p class="match3"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match4</h3>
-          <p class ="match4"> Loading ... </p>
+          <p class="match4"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match5</h3>
-          <p class ="match5"> Loading ... </p>
+          <p class="match5"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match6</h3>
-          <p class ="match6"> Loading ... </p>
+          <p class="match6"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match7</h3>
-          <p class ="match7"> Loading ... </p>
+          <p class="match7"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match8</h3>
-          <p class ="match8"> Loading ... </p>
+          <p class="match8"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match9</h3>
-          <p class ="match9"> Loading ... </p>
+          <p class="match9"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match10</h3>
-          <p class ="match10"> Loading ... </p>
+          <p class="match10"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match11</h3>
-          <p class ="match11"> Loading ... </p>
+          <p class="match11"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match12</h3>
-          <p class ="match12"> Loading ... </p>
+          <p class="match12"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match13</h3>
-          <p class ="match13"> Loading ... </p>
+          <p class="match13"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match14</h3>
-          <p class ="match14"> Loading ... </p>
+          <p class="match14"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match15</h3>
-          <p class ="match15"> Loading ... </p>
+          <p class="match15"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match16</h3>
-          <p class ="match16"> Loading ... </p>
+          <p class="match16"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match17</h3>
-          <p class ="match17"> Loading ... </p>
+          <p class="match17"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match18</h3>
-          <p class ="match18"> Loading ... </p>
+          <p class="match18"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match19</h3>
-          <p class ="match19"> Loading ... </p>
+          <p class="match19"><span class="text">Loading ...</span></p>
         </div>
         <div class="match-item">
           <h3 class="sub-title">match20</h3>
-          <p class ="match20"> Loading ... </p>
+          <p class="match20"><span class="text">Loading ...</span></p>
         </div>
-
-      </section>></h3>
-    </div>/h3>
+      </section>
+      >
+    </div>
   </body>
 </html>
