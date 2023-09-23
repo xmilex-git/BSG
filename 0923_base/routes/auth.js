@@ -8,7 +8,7 @@ router.get("/searchSummoner", async (req, res) => {
   const pUuid = await SummonerService.getSummonerPuuid(summonerName);
 
   if (!pUuid) {
-    return res.status(401).send("유효하지 않음");
+    return res.status(401).send("소환사 없음");
   }
 
   res.status(200).send("검색 성공");
