@@ -1,0 +1,219 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BSG / 전적 함 볼까?</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      let formType = "login";
+
+      const load = async (summonerName) => {
+        try {
+          const data = await fetch(
+            `/match?summonerName=${encodeURIComponent(summonerName)}`
+          ).then((res) => res.json());
+          const title = document.querySelector(`.title`);
+          title.innerText = summonerName;
+          // 각 매치 결과에 따라 적절한 클래스 추가
+          for (let i = 1; i <= 20; i++) {
+            const matchResult = data[i - 1];
+            const matchElement = document.querySelector(`.match${i}`);
+            const textElement = matchElement.querySelector(".text");
+            textElement.innerText = `${matchResult.championName}   ${matchResult.kills}/${matchResult.deaths}/${matchResult.assists} \t \t \t 연속킬: ${matchResult.largestMultiKill}`;
+
+            if (matchResult.win) {
+              matchElement.closest(".match-item").classList.add("victory_bg");
+              matchElement.classList.add("result_field");
+              textElement.classList.add("victory_font");
+            } else {
+              matchElement.closest(".match-item").classList.add("defeat_bg");
+              matchElement.classList.add("result_field");
+              textElement.classList.add("defeat_font");
+            }
+          }
+        } catch (error) {
+          console.error(error);
+          alert("⚠️ 서버에서 데이터를 가져올 수 없어요! ⚠️\n" + error.message);
+        }
+      };
+
+      const searchSummoner = async (e) => {
+        e.preventDefault();
+        const summonerName = e.target.summonerName.value;
+
+        //const password = e.target.password.value;
+        if (!summonerName) {
+          alert("⚠️ 소환사명을 입력해주세요! ⚠️");
+          return;
+        }
+        try {
+          const data = await fetch(
+            `/searchSummoner?summonerName=${encodeURIComponent(summonerName)}`
+          );
+          if (data.status !== 200) {
+            alert(`⚠️ 어떻게 소환사 이름이 ${summonerName}? ⚠️`);
+            return;
+          }
+          document.querySelector(".login").classList.add("hide");
+          await load(summonerName);
+        } catch (error) {
+          console.error(error);
+          alert(
+            `⚠️ 서버에서 ${summonerName} 데이터를 가져올 수 없어요! ⚠️\n` +
+              error.message
+          );
+        }
+      };
+
+      const signup = async (e) => {
+        e.preventDefault();
+        const summonerName = e.target.summonerName.value;
+        const password = e.target.password.value;
+        const email = e.target.email.value;
+        if (!summonerName || !password) {
+          alert("⚠️ 아이디와 비밀번호를 입력해주세요!");
+          return;
+        }
+        if (!email) {
+          alert("⚠️ 이메일을 입력해주세요!");
+          return;
+        }
+        try {
+          const data = await fetch("/signup", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ summonerName, password, email }),
+          });
+          if (data.status !== 201) {
+            alert("⚠️ 회원가입에 실패했어요!");
+            return;
+          }
+          alert("✅ 회원가입에 성공했어요!");
+        } catch (error) {
+          console.error(error);
+          alert("⚠️ 서버에서 데이터를 가져올 수 없어요!\n" + error.message);
+        }
+      };
+
+      const toggle = () => {
+        formType = formType === "login" ? "signup" : "login";
+        document.querySelector("button").innerText =
+          formType === "login" ? "검색" : "회원가입";
+        document.querySelector("a").innerText =
+          formType === "login" ? "회원가입 하기" : "검색 하기";
+        document.querySelector('input[name="email"]').type =
+          formType === "login" ? "hidden" : "email";
+      };
+    </script>
+  </head>
+  <body>
+    <div class="login">
+      <form
+        action="/searchSummoner"
+        method="POST"
+        onsubmit="formType == 'login' ? searchSummoner(event) : signup(event)"
+      >
+        <input type="text" name="summonerName" placeholder="소환사명" />
+        <!-- <input type="password" name="password" placeholder="비밀번호" />
+        <input type="hidden" name="email" placeholder="이메일" /> -->
+        <button type="submit">검색</button>
+        <a onclick="toggle()">회원가입 하기</a>
+      </form>
+    </div>
+    <div class="wrapper">
+      <h1 class="title">About current 20 Games</h1>
+      <h2 class="title">최근 20판 전적!</h2>
+      <section class="card">
+        <div class="match-item">
+          <h3 class="sub-title">match1</h3>
+          <p class="match1"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match2</h3>
+          <p class="match2"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match3</h3>
+          <p class="match3"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match4</h3>
+          <p class="match4"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match5</h3>
+          <p class="match5"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match6</h3>
+          <p class="match6"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match7</h3>
+          <p class="match7"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match8</h3>
+          <p class="match8"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match9</h3>
+          <p class="match9"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match10</h3>
+          <p class="match10"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match11</h3>
+          <p class="match11"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match12</h3>
+          <p class="match12"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match13</h3>
+          <p class="match13"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match14</h3>
+          <p class="match14"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match15</h3>
+          <p class="match15"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match16</h3>
+          <p class="match16"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match17</h3>
+          <p class="match17"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match18</h3>
+          <p class="match18"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match19</h3>
+          <p class="match19"><span class="text">Loading ...</span></p>
+        </div>
+        <div class="match-item">
+          <h3 class="sub-title">match20</h3>
+          <p class="match20"><span class="text">Loading ...</span></p>
+        </div>
+      </section>
+      >
+    </div>
+  </body>
+</html>
